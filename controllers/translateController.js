@@ -1,6 +1,6 @@
 const { OpenAI } = require("openai");
-
-const openai = new OpenAI({apiKey:"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"});
+require('dotenv').config();
+const openai = new OpenAI({apiKey:process.env.CHAT_API});
 
 exports.explainInRussian = async (req, res) => {
     const { word } = req.query;
