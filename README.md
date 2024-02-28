@@ -31,6 +31,7 @@ Yandex Dictionary API (should use english words)
 /main page consist the api's and item that addded by admin
 /admin crud operations with items
 /login auth of user
+Quizzes database consist 120 questions, and reading consist 4 text with at least 6 questions related
 
 Dependencies:
 "bcryptjs": "^2.4.3",
