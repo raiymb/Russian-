@@ -1,6 +1,6 @@
 const { OpenAI } = require("openai");
 
-const openai = new OpenAI({apiKey:"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"});
+const openai = new OpenAI({apiKey:"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"});
 
 exports.explainInRussian = async (req, res) => {
     const { word } = req.query;
