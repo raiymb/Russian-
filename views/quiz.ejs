@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Session</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #submitQuizButton {
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .quiz-result-container {
+          text-align: center;
+          padding: 20px;
+          background-color: #fff;
+          border-radius: 10px;
+          box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+      }
+      .quiz-result {
+          font-size: 48px;
+          color: #007bff;
+          margin-bottom: 20px;
+      }
+      .quiz-result-label {
+          font-size: 24px;
+          color: #6c757d;
+      }
+      .submit-button {
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          font-size: 18px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
+      .submit-button:disabled {
+          background-color: #6c757d;
+          cursor: not-allowed;
+      }
+      .submit-button:hover:enabled {
+          background-color: #0056b3;
+      }
+    </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Derbes</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/quiz">Quiz</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/main">Main</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+    <header class="text-center">
+        <h1>Тест</h1>
+    </header>
+    <main class="quiz-container">
+        <form id="quizForm" >
+            <% mixedQuestions.forEach(function(item, index) { %>
+                <% if(item.content) { %>
+                    <div class="reading" data-reading-id="<%= item._id %>">
+                        <h2><%= item.title %></h2>
+                        <p><%= item.content %></p>
+                        <% item.questions.forEach(function(question, qIndex) { %>
+                            <div class="question" data-question-id="<%= question._id %>">
+                                <p><%= question.question %></p>
+                                <div class="options">
+                                    <% question.options.forEach(function(option, optionIndex) { %>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="answers[<%= item._id %>_<%= qIndex %>]" id="option<%= optionIndex %>" value="<%= optionIndex %>">
+                                            <label class="form-check-label" for="option<%= optionIndex %>"><%= option %></label>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="question" data-question-id="<%= item._id %>">
+                        <p><%= item.question %></p>
+                        <div class="options">
+                            <% item.options.forEach(function(option, optionIndex) { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="answers[<%= item._id %>]" id="option<%= optionIndex %>" value="<%= optionIndex %>">
+                                    <label class="form-check-label" for="option<%= optionIndex %>"><%= option %></label>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+            <% }); %>
+            <div id="timer">Time Left: 20:00</div>
+            <div class="quiz-result-container">
+              <div class="quiz-result" id="quizResult">?</div>
+              <div class="quiz-result-label">Ваш результат: </div>
+              <button type="button" class="submit-button" onclick="submitQuiz()" id="submitButton">Submit Quiz</button>
+          </div>
+        </form>
+    </main>
+    <div class="social-buttons">
+      <a href="https://twitter.com/intent/tweet?text=I+just+completed+a+quiz!+Try+it+out:+http://yourquizurl.com" class="twitter-button" target="_blank">Tweet</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fyourquizurl.com%2F" class="facebook-button" target="_blank">Share on Facebook</a>
+  </div>
+    <script>
+      let timeLeft = 20 * 60; 
+
+      function updateTimer() {
+          const minutes = Math.floor(timeLeft / 60);
+          let seconds = timeLeft % 60;
+          seconds = seconds < 10 ? '0' + seconds : seconds;
+          document.getElementById('timer').textContent = `Time Left: ${minutes}:${seconds}`;
+      }
+
+      const countdown = setInterval(function() {
+          timeLeft--;
+          updateTimer();
+          if (timeLeft <= 0) {
+              clearInterval(countdown);
+              submitQuiz(); 
+          }
+      }, 1000);
+
+      
+      let submitted = false;
+
+      function submitQuiz() {
+        const randomResult = Math.floor(Math.random() * 20); 
+        const quizResultElement = document.getElementById('quizResult');
+        quizResultElement.textContent = `Ваш результат: ${randomResult}`;
+        const submitButton = document.getElementById('submitButton');
+        submitButton.disabled = true;
+    }
+
+    function submit(event) {
+      event.preventDefault(); 
+      submitQuiz();
+  }
+    </script>
+</body>
+</html>

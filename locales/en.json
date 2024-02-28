@@ -1,0 +1,24 @@
+{
+    "navbar": {
+      "home": "Home",
+      "bonus": "Bonus (Test Page)",
+      "adminPage": "Admin Page",
+      "logout": "Logout",
+      "login": "Login"
+    },
+    "main": {
+      "welcome": "Welcome to the Russian Language Test System",
+      "explore": "Explore our features below.",
+      "dictionaryLookup": "Dictionary Lookup",
+      "enterWord": "Enter a word:",
+      "lookup": "Lookup",
+      "textTranslation": "Text Translation",
+      "enterText": "Enter text to translate:",
+      "translateTo": "Translate to:",
+      "translate": "Translate"
+    },
+    "footer": {
+      "copy": "&copy; 2024 Russian Language Test System"
+    }
+  }
+  

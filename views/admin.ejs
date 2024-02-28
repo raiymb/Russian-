@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title >Admin Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .edit-field {
+            border: 1px solid #ced4da;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .image-container { margin-bottom: 20px; }
+        .image-container img { width: 100%; max-width: 200px; margin-right: 10px; }
+        .language-select { margin-bottom: 20px; }
+        .card { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Derbes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/quiz">Quiz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/main">Main</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between">
+            <h1 data-lang="title">Admin Panel</h1>
+            <div class="language-select">
+                <select class="form-control" id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
+        </div>
+
+        <form id="addItemForm" class="mb-4">
+            <div class="form-group">
+                <input type="text" class="form-control" name="nameEn" placeholder="Name (EN)" required />
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="nameRu" placeholder="Name (RU)" required />
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" name="descriptionEn" placeholder="Description (EN)" required></textarea>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" name="descriptionRu" placeholder="Description (RU)" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="image" placeholder="Image URL" required />
+            </div>
+            <button type="submit" class="btn btn-primary" data-lang="addItem">Add Item</button>
+        </form>
+        
+        <% items.forEach(function(item, index) { %>
+            
+            <div class="card mb-3" data-itemid="<%= item._id %>">
+                <div class="card-body">
+                    <div contenteditable="false" class="edit-field card-title" data-field="name.en" data-itemid="<%= item._id %>"><%= item.name.en %></div>
+                    <div contenteditable="false" class="edit-field card-text" data-field="description.en" data-itemid="<%= item._id %>"><%= item.description.en %></div>
+                    <div contenteditable="false" class="edit-field card-title" data-field="name.ru" data-itemid="<%= item._id %>"><%= item.name.ru %></div>
+                    <div contenteditable="false" class="edit-field card-text" data-field="description.ru" data-itemid="<%= item._id %>"><%= item.description.ru %></div>
+                    <div class="image-container" data-itemid="<%= item._id %>">
+                        <% item.images.forEach(function(image, index) { %>
+                            <img src="<%= image %>" data-img-index="<%= index %>" data-itemid="<%= item._id %>" />
+                        <% }); %>
+                        <button class="btn btn-info edit-images" data-itemid="<%= item._id %>" data-lang="edit">Edit Images</button>
+                    </div>
+                    <button class="btn btn-primary edit-item" data-itemid="<%= item._id %>" data-lang ="edit">Edit</button>
+                    <button class="btn btn-success save-item d-none" data-itemid="<%= item._id %> " data-lang="save">Save</button>
+                    <button class="btn btn-danger delete-item" data-itemid="<%= item._id %>" data-lang="delete">Delete</button>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let lang = navigator.language.startsWith('ru') ? 'ru' : 'en'; // Updated to let for reassignment
+        
+        const translations = {
+            en: {
+                title: "Admin Panel",
+                adminPanel: "Admin Panel",
+                addItem: "Add Item",
+                edit: "Edit",
+                save: "Save",
+                delete: "Delete",
+            },
+            ru: {
+                title: "Панель Администратора",
+                adminPanel: "Панель Администратора",
+                addItem: "Добавить Элемент",
+                edit: "Редактировать",
+                save: "Сохранить",
+                delete: "Удалить",
+            }
+        };
+
+        function localize() {
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                el.textContent = translations[lang][key];
+                if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+            document.title = translations[lang].title;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            localize();
+            document.getElementById('languageSelect').value = lang;
+            
+            document.getElementById('languageSelect').addEventListener('change', function() {
+                lang = this.value;
+                localize();
+            });
+            document.querySelectorAll('.edit-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-itemid');
+                    document.querySelectorAll(`[data-itemid="${itemId}"] [contenteditable]`).forEach(element => {
+                        element.contentEditable = true;
+                        element.classList.add('edit-field');
+                    });
+                    document.querySelectorAll(`.image-container[data-itemid="${itemId}"] img`).forEach(img => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = img.src;
+                        img.parentNode.replaceChild(input, img);
+                    });
+                    this.classList.add('d-none');
+                    document.querySelector(`.save-item[data-itemid="${itemId}"]`).classList.remove('d-none');
+                });
+            });
+    
+            // Save updates
+            document.querySelectorAll('.save-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-itemid');
+                    const updatedNameEn = document.querySelector(`[data-itemid="${itemId}"][data-field="name.en"]`).textContent;
+                    const updatedDescriptionEn = document.querySelector(`[data-itemid="${itemId}"][data-field="description.en"]`).textContent;
+                    const updatedNameRu = document.querySelector(`[data-itemid="${itemId}"][data-field="name.ru"]`).textContent;
+                    const updatedDescriptionRu = document.querySelector(`[data-itemid="${itemId}"][data-field="description.ru"]`).textContent;
+                    const imageInputs = document.querySelectorAll(`.image-container[data-itemid="${itemId}"] input`);
+                    const images = Array.from(imageInputs).map(input => input.value);
+    
+                    fetch(`/update-item/${itemId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            nameEn: updatedNameEn, 
+                            descriptionEn: updatedDescriptionEn,
+                            nameRu: updatedNameRu, 
+                            descriptionRu: updatedDescriptionRu,
+                            images: images
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Update successful:', data);
+                        // Reset fields to non-editable and replace input fields with updated images
+                        document.querySelectorAll(`[data-itemid="${itemId}"] [contenteditable]`).forEach(element => {
+                            element.contentEditable = false;
+                            element.classList.remove('edit-field');
+                        });
+                        const container = document.querySelector(`.image-container[data-itemid="${itemId}"]`);
+                        container.innerHTML = ''; // Clear current content
+                        images.forEach(imgSrc => {
+                            const img = document.createElement('img');
+                            img.src = imgSrc;
+                            container.appendChild(img);
+                        });
+                        container.appendChild(button); // Re-add the edit button
+                        this.classList.add('d-none');
+                        document.querySelector(`.edit-item[data-itemid="${itemId}"]`).classList.remove('d-none');
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+    
+            // Handle deletion
+            document.querySelectorAll('.delete-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-itemid');
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        fetch(`/delete-item/${itemId}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Deletion successful:', data);
+                            document.querySelector(`.card[data-itemid="${itemId}"]`).remove();
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        });
+        document.getElementById('addItemForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const formData = new FormData(this);
+            const data = {
+                nameEn: formData.get('nameEn'),
+                nameRu: formData.get('nameRu'),
+                descriptionEn: formData.get('descriptionEn'),
+                descriptionRu: formData.get('descriptionRu'),
+                images: [formData.get('image')] // Assuming a single image for simplicity, but can be adjusted for multiple images
+            };
+            
+            fetch('/add-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item added:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+        
+        
+    </script>
+</body>
+</html>
